@@ -1,4 +1,7 @@
+import 'package:daily_tasks_app/provider/projects.dart';
+import 'package:daily_tasks_app/widgets/project_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({
@@ -7,6 +10,8 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final providerData = Provider.of<Projects>(context).projects;
+
     return Scaffold(
       body: CustomScrollView(
         slivers: [
@@ -48,10 +53,10 @@ class HomeScreen extends StatelessWidget {
                           ),
                         ),
                 ),
-                background: const Stack(
+                background: Stack(
                   fit: StackFit.expand,
                   children: [
-                    SizedBox(
+                    const SizedBox(
                       height: 200,
                       width: double.infinity,
                     ),
@@ -78,7 +83,7 @@ class HomeScreen extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
+                          const Text(
                             "Hello, Favour",
                             style: TextStyle(
                               color: Colors.black87,
@@ -86,7 +91,7 @@ class HomeScreen extends StatelessWidget {
                               fontWeight: FontWeight.w600,
                             ),
                           ),
-                          SizedBox(
+                          const SizedBox(
                             height: 10,
                           ),
                           Row(
@@ -95,7 +100,7 @@ class HomeScreen extends StatelessWidget {
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(
+                                  const Text(
                                     "Your",
                                     style: TextStyle(
                                       color: Colors.black,
@@ -104,8 +109,8 @@ class HomeScreen extends StatelessWidget {
                                     ),
                                   ),
                                   Text(
-                                    "Projects (6)",
-                                    style: TextStyle(
+                                    "Projects (${providerData.length})",
+                                    style: const TextStyle(
                                       color: Colors.black,
                                       fontSize: 40,
                                       fontWeight: FontWeight.bold,
@@ -113,10 +118,10 @@ class HomeScreen extends StatelessWidget {
                                   ),
                                 ],
                               ),
-                              SizedBox(
+                              const SizedBox(
                                 width: 20,
                               ),
-                              CircleAvatar(
+                              const CircleAvatar(
                                 backgroundImage:
                                     AssetImage('images/profile.jpg'),
                                 radius: 45,
@@ -145,36 +150,12 @@ class HomeScreen extends StatelessWidget {
             delegate: SliverChildBuilderDelegate(
               (context, index) {
                 // Text('$index')
-                return Card(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30),
-                  ),
-                  margin: const EdgeInsets.all(15),
-                  child: Container(
-                    height: 350,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(30),
-                      // backgroundBlendMode: BlendMode.colorBurn,
-                      gradient: const SweepGradient(
-                        colors: [
-                          Colors.blueAccent,
-                          Colors.purple,
-                          Colors.pinkAccent,
-                          Colors.purple,
-                          Colors.blue,
-                        ],
-                        startAngle: 4.5,
-                        center: Alignment.bottomLeft,
-                        // focal: Alignment.centerLeft,
-                        // radius: 2,
-                        // end: Alignment.center,
-                      ),
-                    ),
-                    child: Text('$index'),
-                  ),
+                return ProjectWidget(
+                  id: providerData[index].id,
+                  projectTitle: providerData[index].projectName,
                 );
               },
-              childCount: 2000,
+              childCount: providerData.length,
             ),
           ),
         ],

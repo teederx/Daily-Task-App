@@ -22,6 +22,12 @@ class MyApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         title: 'Flutter Demo',
         theme: ThemeData(
+          pageTransitionsTheme: const PageTransitionsTheme(
+            builders:{
+            TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
+            TargetPlatform.android: FadeUpwardsPageTransitionsBuilder(),
+            }
+          ),
             useMaterial3: true,
             appBarTheme: const AppBarTheme(
               backgroundColor: Colors.white,

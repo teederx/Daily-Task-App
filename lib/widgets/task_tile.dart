@@ -17,76 +17,110 @@ class TasksTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final taskList = providerData.projectTasksList(id: id);
     return SizedBox(
       height: height * 0.4,
-      child: SingleChildScrollView(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            SizedBox(
-              height: height * 0.4,
-              child: ListView.builder(
-                itemBuilder: (context, index) {
-                  return Card(
-                    color: Colors.white,
-                    child: ListTile(
-                      onTap: () {},
-                      leading: InkWell(
-                        onTap: () => providerData.isCompleted(
-                            id: id,
-                            taskId: providerData
-                                .projectTasksList(id: id)[index]
-                                .taskId),
-                        child: CircleAvatar(
-                          radius: 25,
-                          backgroundColor:
-                              const Color.fromARGB(255, 196, 194, 194),
-                          child: providerData
-                                  .projectTasksList(id: id)[index]
-                                  .isCompleted
-                              ? const Icon(Icons.check_rounded)
-                              : const CircleAvatar(
-                                  radius: 23,
-                                  backgroundColor: Colors.white,
+      child: taskList.isEmpty
+          ? const Center(
+              child: Text(
+                'No Tasks yet',
+                style: TextStyle(
+                  color: Colors.black,
+                ),
+              ),
+            )
+          : SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  SizedBox(
+                    height: height * 0.4,
+                    child: ListView.builder(
+                      itemBuilder: (context, index) {
+                        return Dismissible(
+                          direction: DismissDirection.endToStart,
+                          resizeDuration: const Duration(milliseconds: 200),
+                          key: ObjectKey(
+                            taskList.elementAt(index),
+                          ),
+                          onDismissed: (direction) {
+                            providerData.deleteTasks(
+                                projectId: id, index: index);
+                            ScaffoldMessenger.of(context).clearSnackBars();
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Task deleted successfully'),
+                              ),
+                            );
+                          },
+                          background: Container(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 28.0),
+                            alignment: AlignmentDirectional.centerEnd,
+                            color: Colors.red,
+                            child: const Icon(
+                              Icons.delete_forever,
+                              color: Colors.white,
+                              size: 30,
+                            ),
+                          ),
+                          child: Card(
+                            color: Colors.white,
+                            child: ListTile(
+                              onTap: () {},
+                              leading: InkWell(
+                                onTap: () => providerData.isCompleted(
+                                    id: id,
+                                    taskId: providerData
+                                        .projectTasksList(id: id)[index]
+                                        .taskId),
+                                child: CircleAvatar(
+                                  radius: 25,
+                                  backgroundColor:
+                                      const Color.fromARGB(255, 196, 194, 194),
+                                  child: taskList[index].isCompleted
+                                      ? const Icon(Icons.check_rounded)
+                                      : const CircleAvatar(
+                                          radius: 23,
+                                          backgroundColor: Colors.white,
+                                        ),
                                 ),
-                        ),
-                      ),
-                      title: Text(
-                        providerData.projectTasksList(id: id)[index].title,
-                        style: const TextStyle(color: Colors.black),
-                      ),
-                      subtitle: Text(
-                        providerData
-                            .projectTasksList(id: id)[index]
-                            .description,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          color: Color.fromARGB(255, 197, 193, 193),
-                        ),
-                      ),
+                              ),
+                              title: Text(
+                                taskList[index].title,
+                                style: const TextStyle(color: Colors.black),
+                              ),
+                              subtitle: Text(
+                                taskList[index].description,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(
+                                  color: Color.fromARGB(255, 197, 193, 193),
+                                ),
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                      itemCount: taskList.length,
                     ),
-                  );
-                },
-                itemCount: providerData.projectTasksList(id: id).length,
+                  ),
+                  // SizedBox(
+                  //   height: height * 0.4,
+                  //   child: ListView.builder(
+                  //     itemBuilder: (context, index) {
+                  //       return ListTile(
+                  //         title: Text(
+                  //           'item $index',
+                  //           style: const TextStyle(color: Colors.black),
+                  //         ),
+                  //       );
+                  //     },
+                  //     itemCount: projectDetails['completedTasksLength'],
+                  //   ),
+                  // ),
+                ],
               ),
             ),
-            // SizedBox(
-            //   height: height * 0.4,
-            //   child: ListView.builder(
-            //     itemBuilder: (context, index) {
-            //       return ListTile(
-            //         title: Text(
-            //           'item $index',
-            //           style: const TextStyle(color: Colors.black),
-            //         ),
-            //       );
-            //     },
-            //     itemCount: projectDetails['completedTasksLength'],
-            //   ),
-            // ),
-          ],
-        ),
-      ),
     );
   }
 }

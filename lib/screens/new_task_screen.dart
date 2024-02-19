@@ -25,6 +25,17 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
   var _enteredProjectName = '';
   var _newProject = false;
 
+  bool newProject() {
+    if (_projectId == '') {
+      setState(() {
+        _newProject = true;
+      });
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   void _getStatusBarHeight() async {
     final height = await StatusBarControl.getHeight;
     _projectId = widget.id;
@@ -44,8 +55,10 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
     if (!isValid) {
       ScaffoldMessenger.of(context).clearSnackBars();
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('No task title'),
+        SnackBar(
+          content: newProject()
+              ? const Text('No project or task title')
+              : const Text('No task title'),
         ),
       );
       return;
@@ -97,6 +110,7 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
   @override
   void initState() {
     _getStatusBarHeight();
+    // newProject();
     // isSelected();
     super.initState();
   }
@@ -106,6 +120,7 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
     final size = MediaQuery.of(context).size;
     final height = size.height - _statusbarHeight;
     final bottom = MediaQuery.of(context).viewInsets.bottom;
+    final projectList = Provider.of<Projects>(context).projects;
 
     return Scaffold(
       body: SingleChildScrollView(
@@ -180,85 +195,86 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
                   SizedBox(
                     height: height * 0.045,
                   ),
-                  SizedBox(
-                    width: double.infinity,
-                    height: height * 0.13,
-                    // color: Colors.black,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text(
-                          'PROJECTS',
-                          style: TextStyle(
-                            color: Colors.grey,
-                            letterSpacing: 2,
-                            fontSize: 16,
-                          ),
-                        ),
-                        SizedBox(
-                          // color: Colors.grey,
-                          width: double.infinity,
-                          height: height * 0.08,
-                          child: SingleChildScrollView(
-                            scrollDirection: Axis.horizontal,
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                if (_newProject == false)
-                                  CircleBubble(
-                                    icon: Icons.add,
-                                    onTap: () => setState(() {
-                                      _projectId = '';
-                                      _newProject = true;
-                                    }),
-                                  ),
-                                Flexible(
-                                  child: Consumer<Projects>(
-                                    builder: (context, providerData, _) =>
-                                        ListView.builder(
-                                      shrinkWrap: true,
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 10),
-                                      physics:
-                                          const NeverScrollableScrollPhysics(),
-                                      scrollDirection: Axis.horizontal,
-                                      itemCount: providerData.projects.length,
-                                      itemBuilder: (context, index) {
-                                        return Bubble(
-                                          title: providerData
-                                              .projects[index].projectName,
-                                          onTap: () {
-                                            setState(() {
-                                              _projectId = providerData
-                                                  .projects[index].id;
-                                              _newProject = false;
-                                            });
-                                            providerData.isSelected(
-                                                id: _projectId!);
-                                          },
-                                          isSelected: _projectId ==
-                                                  providerData
-                                                      .projects[index].id
-                                              ? true
-                                              : false,
-                                        );
-                                      },
-                                    ),
-                                  ),
-                                ),
-                              ],
+                  if (projectList.isNotEmpty)
+                    SizedBox(
+                      width: double.infinity,
+                      height: height * 0.13,
+                      // color: Colors.black,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            'PROJECTS',
+                            style: TextStyle(
+                              color: Colors.grey,
+                              letterSpacing: 2,
+                              fontSize: 16,
                             ),
                           ),
-                        ),
-                      ],
+                          SizedBox(
+                            // color: Colors.grey,
+                            width: double.infinity,
+                            height: height * 0.08,
+                            child: SingleChildScrollView(
+                              scrollDirection: Axis.horizontal,
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  if (newProject() == false)
+                                    CircleBubble(
+                                      icon: Icons.add,
+                                      onTap: () => setState(() {
+                                        _projectId = '';
+                                        _newProject = true;
+                                      }),
+                                    ),
+                                  Flexible(
+                                    child: Consumer<Projects>(
+                                      builder: (context, providerData, _) =>
+                                          ListView.builder(
+                                        shrinkWrap: true,
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 10),
+                                        physics:
+                                            const NeverScrollableScrollPhysics(),
+                                        scrollDirection: Axis.horizontal,
+                                        itemCount: providerData.projects.length,
+                                        itemBuilder: (context, index) {
+                                          return Bubble(
+                                            title: providerData
+                                                .projects[index].projectName,
+                                            onTap: () {
+                                              setState(() {
+                                                _projectId = providerData
+                                                    .projects[index].id;
+                                                _newProject = false;
+                                              });
+                                              providerData.isSelected(
+                                                  id: _projectId!);
+                                            },
+                                            isSelected: _projectId ==
+                                                    providerData
+                                                        .projects[index].id
+                                                ? true
+                                                : false,
+                                          );
+                                        },
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
                   SizedBox(
                     height: height * 0.045,
                   ),
                   SizedBox(
-                    height: _newProject ? height * 0.5 : height * 0.4,
+                    height: newProject() ? height * 0.55 : height * 0.4,
                     child: Padding(
                       padding: const EdgeInsets.only(right: 15.0),
                       child: Column(
@@ -279,7 +295,7 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
                           Expanded(
                             child: Column(
                               children: [
-                                if (_newProject)
+                                if (newProject())
                                   TextFormField(
                                     cursorColor: Colors.black,
                                     textInputAction: TextInputAction.next,
@@ -314,7 +330,7 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
                                     ),
                                     validator: (value) {
                                       if (value!.trim().isEmpty) {
-                                        return;
+                                        return 'No Project title given here';
                                       }
                                       return null;
                                     },
@@ -357,11 +373,10 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
                                   ),
                                   validator: (value) {
                                     if (value!.trim().isEmpty) {
-                                      return;
+                                      return 'No Task title given here';
                                     }
                                     return null;
                                   },
-                                  //TODO: Continue from here...
                                   onSaved: (newValue) =>
                                       _enteredTaskTitle = newValue!,
                                 ),
@@ -379,7 +394,7 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
                                     fontSize: 15,
                                   ),
                                   decoration: InputDecoration(
-                                    labelText: 'Description',
+                                    labelText: 'Description(optional)',
                                     labelStyle: const TextStyle(
                                       color: Color.fromARGB(255, 190, 189, 189),
                                     ),

@@ -3,6 +3,8 @@ import 'package:daily_tasks_app/widgets/project_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import 'new_task_screen.dart';
+
 class HomeScreen extends StatelessWidget {
   const HomeScreen({
     super.key,
@@ -11,6 +13,7 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final providerData = Provider.of<Projects>(context).projects;
+    final height = MediaQuery.of(context).size.height;
 
     return Scaffold(
       body: CustomScrollView(
@@ -146,20 +149,95 @@ class HomeScreen extends StatelessWidget {
             //   collapseMode: CollapseMode.parallax,
             // ),
           ),
-          SliverList(
-            delegate: SliverChildBuilderDelegate(
-              (context, index) {
-                // Text('$index')
-                return ProjectWidget(
-                  id: providerData[index].id,
-                  projectTitle: providerData[index].projectName,
-                );
-              },
-              childCount: providerData.length,
-            ),
-          ),
+          providerData.isEmpty
+              ? SliverToBoxAdapter(
+                  child: SizedBox(
+                    // color: Colors.black,
+                    height: height - 300,
+                    width: double.infinity,
+                    child: const Padding(
+                      padding:EdgeInsets.all(10.0),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            'No Project Here',
+                            style: TextStyle(
+                              color: Colors.black54,
+                              fontSize: 30,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          SizedBox(height: 10,),
+                          Text(
+                            'Click the \'Add New Project\' button to add a new project',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: Colors.black54,
+                              fontSize: 20,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                )
+              : SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    (context, index) {
+                      // Text('$index')
+                      return ProjectWidget(
+                        id: providerData[index].id,
+                        projectTitle: providerData[index].projectName,
+                        index: index,
+                      );
+                    },
+                    childCount: providerData.length,
+                  ),
+                ),
         ],
       ),
+      floatingActionButton: providerData.isEmpty
+          ? FloatingActionButton.extended(
+              label: const Text('Add New Project'),
+              onPressed: () => showModalBottomSheet(
+                context: context,
+                builder: (context) {
+                  return AnimatedContainer(
+                    height: height,
+                    duration: const Duration(milliseconds: 300),
+                    curve: Curves.easeInOut,
+                    child: const NewTaskScreen(
+                      id: '',
+                    ),
+                  );
+                },
+                isScrollControlled: true,
+              ),
+              foregroundColor: Colors.white,
+              tooltip: 'Add project',
+              icon: const Icon(Icons.create_new_folder_outlined),
+            )
+          : FloatingActionButton(
+              onPressed: () => showModalBottomSheet(
+                context: context,
+                builder: (context) {
+                  return AnimatedContainer(
+                    height: height,
+                    duration: const Duration(milliseconds: 300),
+                    curve: Curves.easeInOut,
+                    child: const NewTaskScreen(
+                      id: '',
+                    ),
+                  );
+                },
+                isScrollControlled: true,
+              ),
+              foregroundColor: Colors.white,
+              tooltip: 'Add project',
+              child: const Icon(Icons.create_new_folder_outlined),
+            ),
     );
   }
 }

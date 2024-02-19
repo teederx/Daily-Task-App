@@ -1,8 +1,9 @@
 import 'package:daily_tasks_app/provider/projects.dart';
-import 'package:daily_tasks_app/screens/tasks_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import 'screens/completed_task_screen.dart';
+import 'screens/tasks_screen.dart';
 import 'screens/home_screen.dart';
 
 void main() {
@@ -34,6 +35,8 @@ class MyApp extends StatelessWidget {
         routes: {
           '/': (context) => const HomeScreen(),
           TasksScreen.routeName: (context) => const TasksScreen(),
+          CompletedTaskScreen.routeName: (context) =>
+              const CompletedTaskScreen(),
         },
       ),
     );

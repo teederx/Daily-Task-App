@@ -101,7 +101,27 @@ class Projects extends ChangeNotifier {
     notifyListeners();
   }
 
-  //TODO: Implement delete Tasks
-  //TODO: Implement delete projects
-  
+  void deleteTasks({
+    required String projectId,
+    required int index,
+  }) {
+    final project = _projects.firstWhere((element) => element.id == projectId);
+    final taskList = project.tasks;
+    taskList.removeAt(index);
+    notifyListeners();
+  }
+
+  void deleteProject ({
+    required int index,
+  }){
+    _projects.removeAt(index);
+    notifyListeners();
+  }
+
+  void clearAllCompletedTasks({required String projectId}){
+    final project = _projects.firstWhere((element) => element.id == projectId);
+    final taskList = project.tasks;
+    taskList.removeWhere((element) => element.isCompleted == true);
+    notifyListeners();
+  }
 }

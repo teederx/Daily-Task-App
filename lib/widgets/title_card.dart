@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../provider/projects.dart';
+import '../screens/completed_task_screen.dart';
 import '../screens/new_task_screen.dart';
 import 'bar.dart';
 
@@ -11,15 +12,19 @@ class TitleCard extends StatelessWidget {
     required this.height,
     required this.id,
     required this.providerData,
+    required this.index,
   });
 
   final Map projectDetails;
   final double height;
   final String id;
   final Projects providerData;
+  final int index;
 
   @override
   Widget build(BuildContext context) {
+    final totalTasksList = providerData.projectTasksList(id: id);
+    final completedTasksList = providerData.completedTasksList(id: id);
     return Stack(
       // alignment: Alignment.center,
       children: [
@@ -28,7 +33,7 @@ class TitleCard extends StatelessWidget {
         ),
         Card(
           surfaceTintColor: Colors.black,
-          // margin: const EdgeInsets.all(5),
+          margin: const EdgeInsets.all(0),
           elevation: 10,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(45),
@@ -36,10 +41,13 @@ class TitleCard extends StatelessWidget {
           // margin: const EdgeInsets.only(bottom: 20),
           child: Container(
             height: height * 0.5,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(45),
+            decoration: const BoxDecoration(
+              borderRadius: BorderRadius.only(
+                bottomLeft: Radius.circular(45),
+                bottomRight: Radius.circular(45),
+              ),
               // backgroundBlendMode: BlendMode.colorBurn,
-              gradient: const SweepGradient(
+              gradient: SweepGradient(
                 colors: [
                   Colors.blueAccent,
                   Colors.purple,
@@ -86,9 +94,11 @@ class TitleCard extends StatelessWidget {
                             ),
                           ),
                         ),
-                        InkWell(
-                          onTap: () {},
-                          child: Container(
+                        PopupMenuButton(
+                          position: PopupMenuPosition.under,
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10)),
+                          icon: Container(
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
                               border: Border.all(
@@ -100,12 +110,34 @@ class TitleCard extends StatelessWidget {
                               radius: 25,
                               backgroundColor: Color.fromRGBO(233, 233, 233, 1),
                               child: Icon(
-                                Icons.more_horiz_rounded,
+                                Icons.more_horiz,
                                 size: 30,
                                 color: Colors.grey,
                               ),
                             ),
                           ),
+                          itemBuilder: (BuildContext context) =>
+                              <PopupMenuEntry>[
+                            PopupMenuItem(
+                              child: const Row(
+                                children: [
+                                  Icon(Icons.task_alt_rounded),
+                                  SizedBox(
+                                    width: 5,
+                                  ),
+                                  Text('Show Completed Tasks'),
+                                ],
+                              ),
+                              onTap: () => Navigator.pushNamed(
+                                context,
+                                CompletedTaskScreen.routeName,
+                                arguments: {
+                                  'id': id,
+                                  'projectTitle': projectDetails['title'],
+                                },
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
@@ -131,12 +163,10 @@ class TitleCard extends StatelessWidget {
                           child: Row(
                             children: [
                               Bar(
-                                totalPercentage: providerData
-                                        .completedTasksList(id: id)
-                                        .length /
-                                    providerData
-                                        .projectTasksList(id: id)
-                                        .length,
+                                totalPercentage: totalTasksList.isEmpty
+                                    ? 0
+                                    : completedTasksList.length /
+                                        totalTasksList.length,
                               ),
                               const SizedBox(
                                 width: 10,
@@ -147,7 +177,7 @@ class TitleCard extends StatelessWidget {
                                     MainAxisAlignment.spaceEvenly,
                                 children: [
                                   Text(
-                                    '${providerData.completedTasksList(id: id).length}/${providerData.projectTasksList(id: id).length}',
+                                    '${completedTasksList.length}/${totalTasksList.length}',
                                     style: const TextStyle(
                                       fontWeight: FontWeight.bold,
                                       fontSize: 22,

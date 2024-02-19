@@ -24,6 +24,7 @@ class TasksScreen extends StatelessWidget {
               height: height,
               id: projectDetails['id'],
               providerData: providerData,
+              index: projectDetails['index'],
             ),
             TasksTile(
               height: height,

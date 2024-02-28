@@ -18,6 +18,7 @@ class TasksTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final taskList = providerData.projectTasksList(id: id);
+    final GlobalKey<AnimatedListState> _animatedListKey = GlobalKey();
     return SizedBox(
       height: height * 0.4,
       child: taskList.isEmpty
@@ -35,8 +36,9 @@ class TasksTile extends StatelessWidget {
                 children: [
                   SizedBox(
                     height: height * 0.4,
-                    child: ListView.builder(
-                      itemBuilder: (context, index) {
+                    child: AnimatedList(
+                      key: _animatedListKey,
+                      itemBuilder: (context, index, animation) {
                         return Dismissible(
                           direction: DismissDirection.endToStart,
                           resizeDuration: const Duration(milliseconds: 200),
@@ -45,7 +47,9 @@ class TasksTile extends StatelessWidget {
                           ),
                           onDismissed: (direction) {
                             providerData.deleteTasks(
-                                projectId: id, index: index);
+                                projectId: id,
+                                index: index,
+                                taskId: taskList[index].taskId);
                             ScaffoldMessenger.of(context).clearSnackBars();
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
@@ -64,44 +68,47 @@ class TasksTile extends StatelessWidget {
                               size: 30,
                             ),
                           ),
-                          child: Card(
-                            color: Colors.white,
-                            child: ListTile(
-                              onTap: () {},
-                              leading: InkWell(
-                                onTap: () => providerData.isCompleted(
-                                    id: id,
-                                    taskId: providerData
-                                        .projectTasksList(id: id)[index]
-                                        .taskId),
-                                child: CircleAvatar(
-                                  radius: 25,
-                                  backgroundColor:
-                                      const Color.fromARGB(255, 196, 194, 194),
-                                  child: taskList[index].isCompleted
-                                      ? const Icon(Icons.check_rounded)
-                                      : const CircleAvatar(
-                                          radius: 23,
-                                          backgroundColor: Colors.white,
-                                        ),
+                          child: SizeTransition(
+                            sizeFactor: animation,
+                            child: Card(
+                              color: Colors.white,
+                              child: ListTile(
+                                onTap: () {},
+                                leading: InkWell(
+                                  onTap: () => providerData.isCompleted(
+                                      id: id,
+                                      taskId: providerData
+                                          .projectTasksList(id: id)[index]
+                                          .taskId),
+                                  child: CircleAvatar(
+                                    radius: 25,
+                                    backgroundColor: const Color.fromARGB(
+                                        255, 196, 194, 194),
+                                    child: taskList[index].isCompleted
+                                        ? const Icon(Icons.check_rounded)
+                                        : const CircleAvatar(
+                                            radius: 23,
+                                            backgroundColor: Colors.white,
+                                          ),
+                                  ),
                                 ),
-                              ),
-                              title: Text(
-                                taskList[index].title,
-                                style: const TextStyle(color: Colors.black),
-                              ),
-                              subtitle: Text(
-                                taskList[index].description,
-                                overflow: TextOverflow.ellipsis,
-                                style: const TextStyle(
-                                  color: Color.fromARGB(255, 197, 193, 193),
+                                title: Text(
+                                  taskList[index].title,
+                                  style: const TextStyle(color: Colors.black),
+                                ),
+                                subtitle: Text(
+                                  taskList[index].description,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
+                                    color: Color.fromARGB(255, 197, 193, 193),
+                                  ),
                                 ),
                               ),
                             ),
                           ),
                         );
                       },
-                      itemCount: taskList.length,
+                      initialItemCount: taskList.length,
                     ),
                   ),
                   // SizedBox(

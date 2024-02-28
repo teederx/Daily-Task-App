@@ -193,6 +193,7 @@ class ProjectWidget extends StatelessWidget {
                                     TextButton.icon(
                                       onPressed: () {
                                         providerData.deleteProject(
+                                          projectId: id,
                                             index: index);
                                         Navigator.pop(context);
                                         ScaffoldMessenger.of(context)

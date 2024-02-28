@@ -28,7 +28,7 @@ class CompletedTaskTile extends StatelessWidget {
               completedTasksList.elementAt(index),
             ),
             onDismissed: (direction) {
-              providerData.deleteTasks(projectId: projectId, index: index);
+              providerData.deleteTasks(projectId: projectId, index: index, taskId: completedTasksList[index].taskId);
               ScaffoldMessenger.of(context).clearSnackBars();
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(

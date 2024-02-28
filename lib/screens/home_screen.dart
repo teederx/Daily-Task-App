@@ -149,53 +149,71 @@ class HomeScreen extends StatelessWidget {
             //   collapseMode: CollapseMode.parallax,
             // ),
           ),
-          providerData.isEmpty
-              ? SliverToBoxAdapter(
-                  child: SizedBox(
-                    // color: Colors.black,
-                    height: height - 300,
-                    width: double.infinity,
-                    child: const Padding(
-                      padding:EdgeInsets.all(10.0),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            'No Project Here',
-                            style: TextStyle(
-                              color: Colors.black54,
-                              fontSize: 30,
-                              fontWeight: FontWeight.bold,
-                            ),
+          FutureBuilder(
+            future: Provider.of<Projects>(context, listen: false)
+                .fetchAndSetProjects(),
+            builder: (context, snapshot) =>
+                snapshot.connectionState == ConnectionState.waiting
+                    ? SliverToBoxAdapter(
+                        child: SizedBox(
+                          // color: Colors.black,
+                          height: height - 300,
+                          width: double.infinity,
+                          child: const Center(
+                            child: CircularProgressIndicator(),
                           ),
-                          SizedBox(height: 10,),
-                          Text(
-                            'Click the \'Add New Project\' button to add a new project',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              color: Colors.black54,
-                              fontSize: 20,
-                              fontWeight: FontWeight.w500,
+                        ),
+                      )
+                    : providerData.isEmpty
+                        ? SliverToBoxAdapter(
+                            child: SizedBox(
+                              // color: Colors.black,
+                              height: height - 300,
+                              width: double.infinity,
+                              child: const Padding(
+                                padding: EdgeInsets.all(10.0),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      'No Project Here',
+                                      style: TextStyle(
+                                        color: Colors.black54,
+                                        fontSize: 30,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      height: 10,
+                                    ),
+                                    Text(
+                                      'Click the \'Add New Project\' button to add a new project',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                        color: Colors.black54,
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
                             ),
+                          )
+                        : SliverAnimatedList(
+                            itemBuilder: (context, index, animation) {
+                              return SizeTransition(
+                                sizeFactor: animation,
+                                child: ProjectWidget(
+                                  id: providerData[index].id,
+                                  projectTitle: providerData[index].projectName,
+                                  index: index,
+                                ),
+                              );
+                            },
+                            initialItemCount: providerData.length,
                           ),
-                        ],
-                      ),
-                    ),
-                  ),
-                )
-              : SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                    (context, index) {
-                      // Text('$index')
-                      return ProjectWidget(
-                        id: providerData[index].id,
-                        projectTitle: providerData[index].projectName,
-                        index: index,
-                      );
-                    },
-                    childCount: providerData.length,
-                  ),
-                ),
+          ),
         ],
       ),
       floatingActionButton: providerData.isEmpty
